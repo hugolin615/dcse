@@ -49,6 +49,7 @@ for loop1 = 1 : sample_size
     % perform an appopriate power flow analysis to obtain true measurements
     %  or measurements without noise
     % here DC power flow analysis as an example
+	%  more often OPF is used to adjust all generation in a more realistic way
     mpopt = mpoption('model', 'DC');
     baseresult = runpf(mpccase, mpopt);
 

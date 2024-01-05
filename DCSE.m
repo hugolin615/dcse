@@ -112,7 +112,8 @@ z = z_true_red + NOISE * rand(size(sigma_vector)).* sigma_vector; % to remove th
 %% perform weight least square error DC state estimation
 
 gain = transpose(H_red) * R_inv * H_red;
-x_est = inv(gain) * transpose(H_red) * R_inv * z;
+A_rev = inv(gain) * transpose(H_red) * R_inv
+x_est = A_rev * z;
 z_est = H_red * x_est;
 
 error_sqrsum = sum((z - z_est).^2./sigma_square)
@@ -123,6 +124,22 @@ freedom = length(z_est) - length(x_est);
 baddata_t = chi2inv(alpha, freedom)
 
 if error_sqrsum > baddata_t
+    fprintf('bad data detected!');
+end
+
+%% FDIA implementation
+random_vector = -0.05 + (0.05 + 0.05) * rand(size(x_est));
+c = random_vector .* x_est;
+
+a = H_red * c;
+za = z + a;
+
+xa_est = A_rev * za;
+za_est = H_red * xa_est;
+
+fdia_error_sqrsum = sum((za - za_est).^2./sigma_square)
+
+if fdia_error_sqrsum > baddata_t
     fprintf('bad data detected!');
 end
 
